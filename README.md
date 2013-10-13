@@ -38,3 +38,35 @@ Options
     * defaults to current directory
 * `-b, --background`
     * run COMMAND in background (`&`)
+
+Notes
+-----
+* Note that the command run by fuzzyterm is run as a subprocess. As such, it
+  cannot directly affect the environment of the parent process.  Passing a
+  command like `cd`, for example, will not change the directory. However,
+  something like the following bash shell function could be used along with
+  fuzzyterm as a workaround to such a limitation.
+ 
+    ```bash
+    # example function to use fuzzyterm to change directories
+    function fcd {
+        fcdpipe=/tmp/fcdfifo
+        # create a named pipe
+        if [[ ! -p $fcdpipe ]]; then
+            mkfifo $fcdpipe
+        fi
+
+        # echo selection to named pipe
+        # (process must be backgrounded or it will block)
+        fuzzyterm.py --background --output $fcdpipe
+
+        # check fuzzyterm exit code
+        if [[ $? -ne 0 ]]; then
+            rm $fcdpipe
+        else
+            # cd using the selection piped into the named pipe
+            read directory <$fcdpipe
+            cd "$directory"
+        fi
+    }
+    ```
