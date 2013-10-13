@@ -143,10 +143,9 @@ class term_list:
 
 
 class term_fuzzy:
-    def __init__(self, command=None, options=None,
-                 length=None, path=None, output=None, isBackground=None):
+    def __init__(self, command=None, length=None, path=None, output=None,
+          isBackground=None):
         self.command = command
-        self.options = options
         self.length = length
         os.chdir(path)
         self.output = output
@@ -285,11 +284,17 @@ class term_fuzzy:
     ## End of Process Key functions
 
     def __run_command(self, item):
-        command = [self.command]
-        if self.options:
-            command.append(self.options)
-        command.append(item)
-        subprocess.check_call(command, stdout=open(self.output, "w") if self.output else None)
+        # old 'safer(?)' code kept for reference
+        # command = [self.command]
+        # if self.options:
+        #     command.append(self.options)
+        # command.append(item)
+        # subprocess.check_call(command, stdout=open(self.output, "w") if self.output else None)
+
+        subprocess.check_call(
+              '{:s} "{:s}"'.format(self.command, item),
+              shell=True,
+              stdout=open(self.output, "w") if self.output else None)
 
     def __clear(self):
         """Clear self.
@@ -343,8 +348,6 @@ def main():
     )
     parser.add_argument("-c", "--command", default="echo", type=str,
                         help="command to run")
-    parser.add_argument("-t", "--options", default=None, type=str,
-                        help="options for COMMAND")
     parser.add_argument("-l", "--length", default=20, type=int,
                         help="maximum number of items displayed in list")
     parser.add_argument("-p", "--path", default=os.getcwd(), type=str,
@@ -357,7 +360,6 @@ def main():
     args = parser.parse_args()
 
     comm = term_fuzzy(command=args.command,
-                      options=args.options,
                       length=args.length,
                       path=args.path,
                       output=args.output,
