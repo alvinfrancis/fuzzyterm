@@ -31,6 +31,8 @@ Options
     * defaults to: `echo`
 * `-t OPTIONS, --options OPTIONS`
     * options for COMMAND
+* `-l LENGTH, --length LENGTH`
+    * maximum number of items displayed in list
 * `-o OUTPUT, --output OUTPUT`
     * redirect COMMAND stdout to OUTPUT
 * `-p PATH, --path PATH`

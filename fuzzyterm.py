@@ -143,16 +143,17 @@ class term_list:
 
 
 class term_fuzzy:
-    def __init__(self, candidates=None, command=None, options=None, path=None,
-                 output=None, isBackground=None):
+    def __init__(self, candidates=None, command=None, options=None,
+                 length=None, path=None, output=None, isBackground=None):
         self.command = command
         self.options = options
+        self.length = length
         os.chdir(path)
         self.output = output
         self.isBackground = isBackground
         self.prompt = term_prompt()
         self.candidates = \
-                term_list(term_fuzzy.__get_candidates(self.prompt.line),
+                term_list(term_fuzzy.__get_candidates(self.prompt.line, self.length),
                           term_fuzzy.__display_path)
         self.candidates.__display_line = term_fuzzy.__display_path
         self.process_key = { 127: self.__process_backspace,         #Backspace
@@ -319,12 +320,13 @@ class term_fuzzy:
 
         # Clear must be done here before candidates.lines is updated
         self.candidates.clear()
-        self.candidates.lines = term_fuzzy.__get_candidates(self.prompt.line)
+        self.candidates.lines = term_fuzzy.__get_candidates(self.prompt.line,
+                                                            self.length)
 
     @staticmethod
-    def __get_candidates(match):
+    def __get_candidates(match, length):
         return fuzzy_match_in_list(match,
-                                   os.listdir(os.getcwd()))[:20]
+                                   os.listdir(os.getcwd()))[:length]
 
     @staticmethod
     def __display_path(line):
@@ -343,18 +345,21 @@ def main():
                         help="command to run")
     parser.add_argument("-t", "--options", default=None, type=str,
                         help="options for COMMAND")
-    parser.add_argument("-o", "--output", default=None, type=str,
-                        help="stdout redirect")
+    parser.add_argument("-l", "--length", default=20, type=int,
+                        help="maximum number of items displayed in list")
     parser.add_argument("-p", "--path", default=os.getcwd(), type=str,
                         help="starting path")
+    parser.add_argument("-o", "--output", default=None, type=str,
+                        help="stdout redirect")
     parser.add_argument("-b", "--background", action="store_true",
                         dest="isBackground", default=False,
                         help="run command in background (&)")
     args = parser.parse_args()
 
-    comm = term_fuzzy(fuzzy_match_in_list('', os.listdir(os.getcwd()))[:20],
+    comm = term_fuzzy(fuzzy_match_in_list('', os.listdir(os.getcwd()))[:args.length],
                       command=args.command,
                       options=args.options,
+                      length=args.length,
                       path=args.path,
                       output=args.output,
                       isBackground=args.isBackground)
