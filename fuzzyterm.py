@@ -182,6 +182,7 @@ class term_fuzzy:
                 # TODO: work on this
                 if ex.args[0] == 'escape':
                     print "Escaping ..."
+                    exit(1)
                 else:
                     pass
                 break
