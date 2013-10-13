@@ -143,7 +143,7 @@ class term_list:
 
 
 class term_fuzzy:
-    def __init__(self, candidates=None, command=None, options=None,
+    def __init__(self, command=None, options=None,
                  length=None, path=None, output=None, isBackground=None):
         self.command = command
         self.options = options
@@ -356,8 +356,7 @@ def main():
                         help="run command in background (&)")
     args = parser.parse_args()
 
-    comm = term_fuzzy(fuzzy_match_in_list('', os.listdir(os.getcwd()))[:args.length],
-                      command=args.command,
+    comm = term_fuzzy(command=args.command,
                       options=args.options,
                       length=args.length,
                       path=args.path,

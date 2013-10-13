@@ -10,7 +10,7 @@ Basic Usage
 
         fuzzyterm -c COMMAND
 
-## Keys
+### Keys
 
 * `CTRL-j`: move selection down
 * `CTRL-k`: move selection up
