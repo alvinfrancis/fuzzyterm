@@ -17,7 +17,7 @@ TERM_FOREGROUND_COLOR = { 'BLACK'   : 30,
                           'BLUE'    : 34,
                           'MAGENTA' : 35,
                           'CYAN'    : 36,
-                          'WHITE'   : 37}
+                          'WHITE'   : 37 }
 
 TERM_BACKGROUND_COLOR = { 'BLACK'   : 40,
                           'RED'     : 41,
@@ -32,27 +32,27 @@ TERM_BACKGROUND_COLOR = { 'BLACK'   : 40,
 ROWS, COLUMNS = [int(x) for x in os.popen('stty size', 'r').read().split()]
 
 def TERM_CURSOR_UP(count=1):
-    __TERM_CURSOR_MOVE('A', count)
+    _TERM_CURSOR_MOVE('A', count)
 
 def TERM_CURSOR_DOWN(count=1):
-    __TERM_CURSOR_MOVE('B', count)
+    _TERM_CURSOR_MOVE('B', count)
 
 def TERM_CURSOR_FORWARD(count=1):
-    __TERM_CURSOR_MOVE('C', count)
+    _TERM_CURSOR_MOVE('C', count)
 
 def TERM_CURSOR_BACK(count=1):
-    __TERM_CURSOR_MOVE('D', count)
+    _TERM_CURSOR_MOVE('D', count)
 
 # NEXT_LINE and PREVIOUS_LINE should not be used
 def TERM_NEXT_LINE(count=1):
     TERM_NEWLINE()  # Quick fix
-    # __TERM_CURSOR_MOVE('E', count)
+    # _TERM_CURSOR_MOVE('E', count)
 
 def TERM_PREVIOUS_LINE(count=1):
     TERM_CURSOR_UP(count)  # Quick fix
-    # __TERM_CURSOR_MOVE('F', count)
+    # _TERM_CURSOR_MOVE('F', count)
 
-def __TERM_CURSOR_MOVE(move, count):
+def _TERM_CURSOR_MOVE(move, count):
     stdout.write(chr(27) + "[" + str(count) + move if count > 0 else '')
 
 def TERM_HOME():

@@ -93,9 +93,9 @@ class term_list:
     def __init__(self, lines, display_func=None):
         self.lines = lines
         if display_func == None:
-            self.__display_line = term_list.__display_line
+            self._display_line = term_list._display_line
         else:
-            self.__display_line = display_func
+            self._display_line = display_func
 
     def display(self):
         """Display this term component.
@@ -105,7 +105,7 @@ class term_list:
         """
         for i, line in enumerate(self.lines):
 
-            line = self.__display_line(line)
+            line = self._display_line(line)
             # Highlighting saved here
             if i == self.selected_offset:
                 line = TERM_HIGHLIGHT(line)
@@ -134,7 +134,7 @@ class term_list:
         return self.lines[self.selected_offset]
 
     @staticmethod
-    def __display_line(line):
+    def _display_line(line):
         """
         Override this method to add additional processing to a line before
         being displayed
@@ -152,18 +152,18 @@ class term_fuzzy:
         self.isBackground = isBackground
         self.prompt = term_prompt()
         self.candidates = \
-                term_list(term_fuzzy.__get_candidates(self.prompt.line, self.length),
-                          term_fuzzy.__display_path)
-        self.candidates.__display_line = term_fuzzy.__display_path
-        self.process_key = { 127: self.__process_backspace,         #Backspace
-                              27: self.__process_escape,            #Escape
-                              21: self.__process_clear_prompt,      #CTRL-u
-                              20: self.__process_select_directory,  #CTRL-t
-                              18: self.__process_select_item,       #CTRL-r
-                              12: self.__process_cd_forward,        #CTRL-l
-                              8: self.__process_cd_back,            #CTRL-h
-                              11: self.__process_select_up,         #CTRL-k
-                              10: self.__process_select_down        #CTRL-j
+                term_list(term_fuzzy._get_candidates(self.prompt.line, self.length),
+                          term_fuzzy._display_path)
+        self.candidates._display_line = term_fuzzy._display_path
+        self.process_key = { 127: self._process_backspace,         #Backspace
+                              27: self._process_escape,            #Escape
+                              21: self._process_clear_prompt,      #CTRL-u
+                              20: self._process_select_directory,  #CTRL-t
+                              18: self._process_select_item,       #CTRL-r
+                              12: self._process_cd_forward,        #CTRL-l
+                              8: self._process_cd_back,            #CTRL-h
+                              11: self._process_select_up,         #CTRL-k
+                              10: self._process_select_down        #CTRL-j
                             }
 
     def run(self):
@@ -174,10 +174,10 @@ class term_fuzzy:
         stdout.flush()
         while True:
             try:
-                ord(self.__parsekey())
+                ord(self._parsekey())
                 TERM_NEWLINE()
-                self.__refresh()
-                self.__redraw()
+                self._refresh()
+                self._redraw()
             except Exception, ex:
                 # TODO: work on this
                 if ex.args[0] == 'escape':
@@ -187,7 +187,7 @@ class term_fuzzy:
                     pass
                 break
 
-    def __parsekey(self):
+    def _parsekey(self):
         """Parse and process key and return the ordinality of the key signal.
 
         Assumes that the cursor is on the prompt.
@@ -205,7 +205,7 @@ class term_fuzzy:
         except KeyError:
             # Normal letter key
             if str(key).isalnum() | str(key).isspace():
-                self.__process_normal(key)
+                self._process_normal(key)
                 self.candidates.selected_offset = 0
             else:
                 pass
@@ -217,59 +217,59 @@ class term_fuzzy:
     # 1.) Pre-processing: the cursor should be at the end of the prompt line.
     # 2.) Post-processing: the cursor should be at the beginning of the
     #     candidates list.
-    # 3.) This is not responsible for redraw (leave that to __redraw in the
+    # 3.) This is not responsible for redraw (leave that to _redraw in the
     #     run loop)
 
-    def __process_normal(self, key):
+    def _process_normal(self, key):
         self.prompt.line += key
 
-    def __process_escape(self):
-        self.__clear()
+    def _process_escape(self):
+        self._clear()
         raise Exception('escape')
 
-    def __process_backspace(self):
+    def _process_backspace(self):
         self.prompt.line = self.prompt.line[:-1]
 
-    def __process_clear_prompt(self):
+    def _process_clear_prompt(self):
         self.prompt.line = ''
 
-    def __process_select_down(self):
+    def _process_select_down(self):
         self.candidates.selected_offset = \
             (self.candidates.selected_offset + 1) % len(self.candidates.lines)
 
-    def __process_select_up(self):
+    def _process_select_up(self):
         self.candidates.selected_offset = \
             (self.candidates.selected_offset - 1) % len(self.candidates.lines)
 
-    def __process_select_item(self):
-        self.__clear()
+    def _process_select_item(self):
+        self._clear()
         # Flush to immediately get clear effect or else output might get garbled
         stdout.flush()
 
         if self.isBackground:
             child_pid = os.fork()
             if child_pid==0:
-                self.__run_command(os.getcwd() + "/" + self.candidates.get_selected())
+                self._run_command(os.getcwd() + "/" + self.candidates.get_selected())
         else:
-            self.__run_command(os.getcwd() + "/" + self.candidates.get_selected())
+            self._run_command(os.getcwd() + "/" + self.candidates.get_selected())
 
         raise Exception('select')
 
-    def __process_select_directory(self):
-        self.__clear()
+    def _process_select_directory(self):
+        self._clear()
         # Flush to immediately get clear effect or else output might get garbled
         stdout.flush()
 
         if self.isBackground:
             child_pid = os.fork()
             if child_pid==0:
-                self.__run_command(os.getcwd())
+                self._run_command(os.getcwd())
         else:
-            self.__run_command(os.getcwd())
+            self._run_command(os.getcwd())
 
         raise Exception('select')
 
-    def __process_cd_forward(self):
+    def _process_cd_forward(self):
         try:
             os.chdir(self.candidates.get_selected())
             self.prompt.line = ''
@@ -278,13 +278,13 @@ class term_fuzzy:
             TERM_HOME()
             print ex
 
-    def __process_cd_back(self):
+    def _process_cd_back(self):
         self.prompt.line = ''
         os.chdir("..")
 
     ## End of Process Key functions
 
-    def __run_command(self, item):
+    def _run_command(self, item):
         # old 'safer(?)' code kept for reference
         # command = [self.command]
         # if self.options:
@@ -297,7 +297,7 @@ class term_fuzzy:
               shell=True,
               stdout=open(self.output, "w") if self.output else None)
 
-    def __clear(self):
+    def _clear(self):
         """Clear self.
 
         Post: Cursor at prompt.
@@ -308,7 +308,7 @@ class term_fuzzy:
         self.candidates.clear()
         TERM_CURSOR_UP()
 
-    def __redraw(self):
+    def _redraw(self):
         """Redraw self.
 
         Pre:  Cursor at the beginning of candidate list.
@@ -321,21 +321,21 @@ class term_fuzzy:
         self.prompt.display()
         stdout.flush()
 
-    def __refresh(self):
+    def _refresh(self):
         """Refresh according to logic. """
 
         # Clear must be done here before candidates.lines is updated
         self.candidates.clear()
-        self.candidates.lines = term_fuzzy.__get_candidates(self.prompt.line,
+        self.candidates.lines = term_fuzzy._get_candidates(self.prompt.line,
                                                             self.length)
 
     @staticmethod
-    def __get_candidates(match, length):
+    def _get_candidates(match, length):
         return fuzzy_match_in_list(match,
                                    os.listdir(os.getcwd()))[:length]
 
     @staticmethod
-    def __display_path(line):
+    def _display_path(line):
         if os.path.isdir(line):
             line = TERM_DISPLAY_ATTR(line, TERM_FOREGROUND_COLOR['BLUE'])
         if os.path.islink(line):
