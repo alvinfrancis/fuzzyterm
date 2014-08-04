@@ -35,6 +35,10 @@ def fuzzy_match_in_list(input, candidates=[f for f in os.listdir(os.getcwd())]):
 
 
 class term_line:
+    """ A line term_component.
+
+    Prototype class for the term_prompt class
+    """
     def __init__(self):
         self.line = ''
 
@@ -52,8 +56,9 @@ class term_line:
 
 
 class term_prompt:
-    """
-    Same as term_line, but also includes a rjust-ed prompt
+    """ A prompt term component.
+
+    Same as term_line, but also includes a rjust-ed rprompt.
     """
     def __init__(self):
         self.line = ''
@@ -74,7 +79,11 @@ class term_prompt:
         stdout.write(self.line)
 
     def clear(self):
-        """Clear this term component. """
+        """Clear this term component.
+
+        Pre:  Cursor at the beginning of this term component.
+        Post: Cursor at the beginning of this term component.
+        """
         TERM_ERASE_LINE()
         TERM_HOME()
 
@@ -143,6 +152,7 @@ class term_list:
 
 
 class term_fuzzy:
+    """ Term component """
     def __init__(self, command=None, length=None, path=None, output=None,
           isBackground=None):
         self.command = command
@@ -327,7 +337,7 @@ class term_fuzzy:
         # Clear must be done here before candidates.lines is updated
         self.candidates.clear()
         self.candidates.lines = term_fuzzy._get_candidates(self.prompt.line,
-                                                            self.length)
+                                                           self.length)
 
     @staticmethod
     def _get_candidates(match, length):
