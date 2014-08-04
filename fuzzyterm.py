@@ -167,13 +167,14 @@ class term_fuzzy:
         self.candidates._display_line = term_fuzzy._display_path
         self.process_key = { 127: self._process_backspace,         #Backspace
                               27: self._process_escape,            #Escape
+                               7: self._process_escape,            #CTRL-g
                               21: self._process_clear_prompt,      #CTRL-u
                               20: self._process_select_directory,  #CTRL-t
                               18: self._process_select_item,       #CTRL-r
-                              12: self._process_cd_forward,        #CTRL-l
-                              8: self._process_cd_back,            #CTRL-h
-                              11: self._process_select_up,         #CTRL-k
-                              10: self._process_select_down        #CTRL-j
+                              10: self._process_cd_forward,        #CTRL-j
+                              12: self._process_cd_back,           #CTRL-h
+                              16: self._process_select_up,         #CTRL-p
+                              14: self._process_select_down        #CTRL-n
                             }
 
     def run(self):
@@ -210,7 +211,7 @@ class term_fuzzy:
 
         try:
             self.process_key[ord(key)]()
-            if ord(key) not in [10, 11]:
+            if ord(key) not in [14, 16]:
                 self.candidates.selected_offset = 0
         except KeyError:
             # Normal letter key
