@@ -3,6 +3,8 @@ fuzzyterm.py
 
 Fuzzy incremental search on the terminal.
 
+![fuzzyterm with vim](img/fuzzy-vim.gif)
+
 Basic Usage
 -----------
 
